@@ -76,6 +76,21 @@ const samples = [
   { title: "ジェム集合", style: "cluster", placement: "tragus", color: "#167467", size: 56 },
 ];
 
+const fitPlaces = [
+  { label: "耳たぶ", placement: "lobe", ear: "left" },
+  { label: "軟骨", placement: "helix", ear: "left" },
+  { label: "トラガス", placement: "tragus", ear: "left" },
+  { label: "鼻", placement: "nose" },
+  { label: "セプタム", placement: "septumPlace" },
+  { label: "眉", placement: "brow" },
+  { label: "リップ", placement: "verticalLabret" },
+  { label: "舌", placement: "tonguePlace" },
+  { label: "鎖骨", placement: "collarbone" },
+  { label: "胸元", placement: "chest" },
+  { label: "へそ", placement: "navel" },
+  { label: "骨盤", placement: "pelvis" },
+];
+
 const defaultState = {
   style: "pearl",
   placement: "ears",
@@ -111,6 +126,7 @@ const styleGrid = document.querySelector("#styleGrid");
 const sampleGrid = document.querySelector("#sampleGrid");
 const swatches = document.querySelector("#swatches");
 const fitMode = document.querySelector("#fitMode");
+const fitPlacesGrid = document.querySelector("#fitPlaces");
 const favoritesList = document.querySelector("#favorites");
 const sizeControl = document.querySelector("#sizeControl");
 const spreadControl = document.querySelector("#spreadControl");
@@ -334,6 +350,12 @@ function renderChoices() {
     button.setAttribute("aria-pressed", String(button.dataset.ear === state.activeEar));
   });
   trackingButton.setAttribute("aria-pressed", String(trackingEnabled));
+
+  fitPlacesGrid.innerHTML = fitPlaces.map((item, index) => `
+    <button type="button" data-fit-place="${index}" aria-pressed="${item.placement === state.placement}">
+      ${item.label}
+    </button>
+  `).join("");
 }
 
 function renderTryon() {
@@ -1161,6 +1183,14 @@ fitMode.addEventListener("click", (event) => {
   if (!button) return;
   state.activeEar = button.dataset.ear;
   renderChoices();
+});
+
+fitPlacesGrid.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-fit-place]");
+  if (!button) return;
+  const item = fitPlaces[Number(button.dataset.fitPlace)];
+  if (item.ear) state.activeEar = item.ear;
+  setPlacement(item.placement);
 });
 
 document.querySelector("#photoInput").addEventListener("change", (event) => {

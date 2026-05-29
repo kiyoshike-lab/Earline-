@@ -302,6 +302,7 @@ h1 {
 
 .quick-actions,
 .fit-tools,
+.fit-places,
 .fit-mode {
   display: grid;
   gap: 10px;
@@ -320,9 +321,15 @@ h1 {
   margin-bottom: 10px;
 }
 
+.fit-places {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 10px;
+}
+
 .quick-actions button,
 .file-button,
 .fit-tools button,
+.fit-places button,
 .fit-mode button,
 .text-button,
 .favorite-item button,
@@ -423,6 +430,12 @@ h2 {
 .fit-mode button[aria-pressed="true"] {
   border-color: var(--accent-2);
   box-shadow: 0 0 0 3px rgba(31, 119, 113, .14);
+}
+
+.fit-places button[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(160, 58, 83, .12);
 }
 
 #trackingButton[aria-pressed="true"] {
@@ -651,6 +664,17 @@ input[type="range"] {
     padding: 8px 6px;
     font-size: .88rem;
     overflow-wrap: anywhere;
+  }
+
+  .fit-places {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .fit-places button {
+    min-height: 38px;
+    padding: 7px 6px;
+    font-size: .82rem;
   }
 
   .panel-section + .panel-section {
