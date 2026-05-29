@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Earline | ピアス試着</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <section class="studio" aria-label="ピアス試着エリア">
+        <div class="brand">
+          <span class="mark" aria-hidden="true">E</span>
+          <div>
+            <h1>Earline</h1>
+            <p>写真に合わせてピアスを試せます</p>
+          </div>
+        </div>
+
+        <div class="tryon-shell">
+          <div class="tryon-stage" id="stage">
+            <video id="cameraVideo" autoplay playsinline muted></video>
+            <img id="facePhoto" alt="試着用の顔写真" draggable="false" crossorigin="anonymous">
+            <div class="drop-hint" id="dropHint">
+              <strong>写真かカメラを追加</strong>
+              <span>顔や体に合わせて、ピアスを重ねて調整できます</span>
+            </div>
+            <button class="ear-anchor left" id="leftEar" type="button" aria-label="左のピアス位置">
+              <span class="earring" id="leftEarring"></span>
+            </button>
+            <button class="ear-anchor right" id="rightEar" type="button" aria-label="右のピアス位置">
+              <span class="earring" id="rightEarring"></span>
+            </button>
+            <button class="ear-anchor body" id="bodyPiercing" type="button" aria-label="ボディピアス位置">
+              <span class="earring" id="bodyEarring"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <label class="file-button">
+            <input id="photoInput" type="file" accept="image/*">
+            <span aria-hidden="true">+</span>
+            写真を選ぶ
+          </label>
+          <button id="cameraButton" type="button">● カメラ</button>
+          <button id="trackingButton" type="button">◎ 追尾</button>
+          <button id="favoriteButton" type="button">♡ 候補に追加</button>
+          <button id="resetButton" type="button">↺ リセット</button>
+          <button id="downloadButton" type="button">↓ 保存</button>
+        </div>
+        <div class="status-line" id="statusLine">Camera: ready / Tracking: ready</div>
+      </section>
+
+      <aside class="panel" aria-label="ピアス設定">
+        <div class="panel-section">
+          <h2>Placement</h2>
+          <div class="placement-grid" id="placementGrid"></div>
+        </div>
+
+        <div class="panel-section">
+          <h2>Style</h2>
+          <div class="style-grid" id="styleGrid"></div>
+        </div>
+
+        <div class="panel-section">
+          <h2>Samples</h2>
+          <div class="sample-grid" id="sampleGrid"></div>
+        </div>
+
+        <div class="panel-section">
+          <h2>Color</h2>
+          <div class="swatches" id="swatches"></div>
+        </div>
+
+        <div class="panel-section controls">
+          <label>
+            <span>大きさ</span>
+            <input id="sizeControl" type="range" min="54" max="150" value="92">
+          </label>
+          <label>
+            <span>左右の間隔</span>
+            <input id="spreadControl" type="range" min="8" max="30" value="19">
+          </label>
+          <label>
+            <span>高さ</span>
+            <input id="heightControl" type="range" min="18" max="86" value="45">
+          </label>
+        </div>
+
+        <div class="panel-section">
+          <h2>Fit</h2>
+          <div class="fit-mode" id="fitMode" role="group" aria-label="調整する耳">
+            <button data-ear="both" type="button" aria-pressed="true">両耳</button>
+            <button data-ear="left" type="button" aria-pressed="false">左耳</button>
+            <button data-ear="right" type="button" aria-pressed="false">右耳</button>
+          </div>
+          <div class="fit-tools">
+            <button data-nudge="up" type="button" aria-label="上へ">↑</button>
+            <button data-nudge="left" type="button" aria-label="左へ">←</button>
+            <button data-nudge="down" type="button" aria-label="下へ">↓</button>
+            <button data-nudge="right" type="button" aria-label="右へ">→</button>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h2>Looks</h2>
+          <div class="lookbook" id="lookbook"></div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-title-row">
+            <h2>Compare</h2>
+            <button id="clearFavoritesButton" class="text-button" type="button">クリア</button>
+          </div>
+          <div class="favorites" id="favorites"></div>
+        </div>
+      </aside>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
