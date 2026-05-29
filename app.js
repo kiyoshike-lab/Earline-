@@ -65,11 +65,6 @@ const colors = [
   { name: "Onyx", value: "#242424" },
 ];
 
-const modelPhotos = {
-  noseHoop: "https://images.pexels.com/photos/11830092/pexels-photo-11830092.jpeg?auto=compress&cs=tinysrgb&w=900",
-  multiPiercing: "https://images.pexels.com/photos/26936512/pexels-photo-26936512.jpeg?auto=compress&cs=tinysrgb&w=900",
-};
-
 const samples = [
   { title: "小粒スタッド", style: "stud", placement: "lobe", color: "#c9ced4", size: 48 },
   { title: "軟骨リング", style: "hoop", placement: "helix", color: "#c9ced4", size: 58 },
@@ -79,17 +74,6 @@ const samples = [
   { title: "へそバナナ", style: "banana", placement: "navel", color: "#d6a94a", size: 78 },
   { title: "マイクロダーマル", style: "micro", placement: "collarbone", color: "#c97d70", size: 58 },
   { title: "ジェム集合", style: "cluster", placement: "tragus", color: "#167467", size: 56 },
-];
-
-const looks = [
-  { title: "実写 ノーズ", placement: "nose", style: "hoop", color: "#d6a94a", size: 54, x: 84, y: 53, photo: modelPhotos.noseHoop },
-  { title: "実写 プラグ", placement: "lobe", style: "plug", color: "#c9ced4", size: 70, x: 69, y: 43, photo: modelPhotos.multiPiercing },
-  { title: "実写 セプタム", placement: "septumPlace", style: "horseshoe", color: "#c9ced4", size: 56, x: 33, y: 43, photo: modelPhotos.multiPiercing },
-  { title: "実写 チーク", placement: "cheek", style: "micro", color: "#242424", size: 40, x: 49, y: 39, photo: modelPhotos.multiPiercing },
-  { title: "耳たぶ 定番", placement: "lobe", style: "pearl", color: "#d6a94a", size: 68, x: 30, y: 57 },
-  { title: "軟骨リング", placement: "helix", style: "hoop", color: "#c9ced4", size: 58, x: 23, y: 34 },
-  { title: "鎖骨", placement: "collarbone", style: "dermal", color: "#c97d70", size: 64, x: 36, y: 82 },
-  { title: "へそ", placement: "navel", style: "banana", color: "#d6a94a", size: 78, x: 50, y: 83 },
 ];
 
 const defaultState = {
@@ -103,6 +87,8 @@ const defaultState = {
   rightY: 45,
   bodyX: 56,
   bodyY: 42,
+  realism: 82,
+  cameraFacing: "user",
   activeEar: "both",
   photo: "",
 };
@@ -123,14 +109,15 @@ const bodyEarring = document.querySelector("#bodyEarring");
 const placementGrid = document.querySelector("#placementGrid");
 const styleGrid = document.querySelector("#styleGrid");
 const sampleGrid = document.querySelector("#sampleGrid");
-const lookbook = document.querySelector("#lookbook");
 const swatches = document.querySelector("#swatches");
 const fitMode = document.querySelector("#fitMode");
 const favoritesList = document.querySelector("#favorites");
 const sizeControl = document.querySelector("#sizeControl");
 const spreadControl = document.querySelector("#spreadControl");
 const heightControl = document.querySelector("#heightControl");
+const realismControl = document.querySelector("#realismControl");
 const cameraButton = document.querySelector("#cameraButton");
+const flipCameraButton = document.querySelector("#flipCameraButton");
 const trackingButton = document.querySelector("#trackingButton");
 const statusLine = document.querySelector("#statusLine");
 let cameraStream = null;
@@ -239,16 +226,24 @@ function syncControls() {
   spreadControl.value = clamp(currentSpread(), 8, 30);
   spreadControl.disabled = state.placement !== "ears";
   heightControl.value = clamp(currentHeight(), 18, 86);
+  realismControl.value = state.realism;
 }
 
 function styleName(id) {
   return styles.find((item) => item.id === id)?.name || id;
 }
 
-function styleSpriteVars(id) {
+function styleSpriteVars(id, spriteOpacity = .72) {
   const sprite = styles.find((item) => item.id === id)?.sprite;
   if (!sprite) return "--sprite-opacity:0";
-  return `--sprite-opacity:.72; --sprite-x:${sprite[0] * 33.3333}%; --sprite-y:${sprite[1] * 33.3333}%`;
+  return `--sprite-opacity:${spriteOpacity}; --sprite-x:${sprite[0] * 33.3333}%; --sprite-y:${sprite[1] * 33.3333}%`;
+}
+
+function activePiercingVars(id) {
+  const realism = state.realism / 100;
+  const spriteOpacity = clamp(.18 + realism * .72, .2, .9);
+  const svgOpacity = clamp(1.05 - realism * .55, .48, .9);
+  return `${styleSpriteVars(id, spriteOpacity)}; --svg-opacity:${svgOpacity}`;
 }
 
 function styleSpriteCell(id) {
@@ -346,9 +341,6 @@ function renderTryon() {
   leftEarring.innerHTML = earringSvg(state.style, state.color);
   rightEarring.innerHTML = earringSvg(state.style, state.color);
   bodyEarring.innerHTML = earringSvg(state.style, state.color);
-  leftEarring.setAttribute("style", styleSpriteVars(state.style));
-  rightEarring.setAttribute("style", styleSpriteVars(state.style));
-  bodyEarring.setAttribute("style", styleSpriteVars(state.style));
 
   leftEar.style.width = `${state.size}px`;
   leftEar.style.height = `${state.size * 1.24}px`;
@@ -363,6 +355,9 @@ function renderTryon() {
   leftEar.style.top = `${state.leftY}%`;
   rightEar.style.top = `${state.rightY}%`;
   bodyPiercing.style.top = `${state.bodyY}%`;
+  leftEarring.setAttribute("style", activePiercingVars(state.style));
+  rightEarring.setAttribute("style", activePiercingVars(state.style));
+  bodyEarring.setAttribute("style", activePiercingVars(state.style));
   syncControls();
   updateAdaptiveLighting();
 }
@@ -763,30 +758,16 @@ function renderSamples() {
   `).join("");
 }
 
-function renderLookbook() {
-  lookbook.innerHTML = looks.map((look, index) => `
-    <button class="look-card" type="button" data-look="${index}">
-      <span class="look-face ${look.photo ? "has-photo" : ""}" style="${look.photo ? `--look-photo: linear-gradient(rgba(0,0,0,.04), rgba(0,0,0,.08)), url('${look.photo}') center / cover;` : ""}">
-        <span class="earring" style="--look-x:${look.x}%; --look-y:${look.y}%; --look-size:${Math.max(32, look.size * .62)}px; ${styleSpriteVars(look.style)}">${earringSvg(look.style, look.color)}</span>
-      </span>
-      <span class="look-title">
-        <strong>${look.title}</strong>
-        <span>${placementName(look.placement)} / ${styleName(look.style)}</span>
-      </span>
-    </button>
-  `).join("");
-}
-
 function render() {
   renderChoices();
   renderTryon();
   renderSamples();
-  renderLookbook();
   renderFavorites();
 }
 
 function updateFromControls() {
   state.size = Number(sizeControl.value);
+  state.realism = Number(realismControl.value);
   if (state.placement !== "ears") {
     state.bodyY = Number(heightControl.value);
     renderTryon();
@@ -908,7 +889,7 @@ async function startCamera() {
   try {
     setStatus("Camera: requesting permission...");
     cameraStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user" },
+      video: { facingMode: state.cameraFacing },
       audio: false,
     });
     cameraVideo.srcObject = cameraStream;
@@ -923,6 +904,17 @@ async function startCamera() {
     setStatus("Camera: permission blocked");
     alert("カメラを開始できませんでした。ブラウザのカメラ許可を確認してください。");
   }
+}
+
+async function flipCamera() {
+  state.cameraFacing = state.cameraFacing === "user" ? "environment" : "user";
+  const wasTracking = trackingEnabled;
+  if (cameraStream) {
+    stopCamera();
+    await startCamera();
+    if (wasTracking) startTracking();
+  }
+  setStatus(`Camera: ${state.cameraFacing === "user" ? "front" : "back"} / Tracking: ${trackingEnabled ? "on" : "ready"}`);
 }
 
 function stopCamera() {
@@ -1033,10 +1025,14 @@ async function downloadTryon() {
     const y = rect.height * yPercent / 100;
     ctx.save();
     ctx.globalCompositeOperation = "multiply";
-    ctx.filter = "blur(3px)";
-    ctx.fillStyle = "rgba(28, 18, 12, .22)";
+    ctx.filter = "blur(1.8px)";
+    ctx.fillStyle = "rgba(28, 18, 12, .28)";
     ctx.beginPath();
-    ctx.ellipse(x, y + height * .05, width * .22, height * .08, -0.18, 0, Math.PI * 2);
+    ctx.ellipse(x, y + height * .01, width * .15, height * .045, -0.14, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "rgba(168, 70, 58, .13)";
+    ctx.beginPath();
+    ctx.ellipse(x, y, width * .09, height * .032, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
 
@@ -1103,24 +1099,6 @@ function applyFavorite(item) {
   render();
 }
 
-function applyLook(look) {
-  customTrackRatio = null;
-  state.placement = look.placement;
-  state.style = look.style;
-  state.color = look.color;
-  state.size = look.size;
-  if (look.photo) usePhotoUrl(look.photo);
-  if (look.placement === "ears") {
-    state.leftX = 50 - currentSpread();
-    state.rightX = 50 + currentSpread();
-  } else {
-    state.bodyX = look.x;
-    state.bodyY = look.y;
-    state.activeEar = "both";
-  }
-  render();
-}
-
 function applySample(sample) {
   customTrackRatio = null;
   state.placement = sample.placement;
@@ -1178,12 +1156,6 @@ sampleGrid.addEventListener("click", (event) => {
   applySample(samples[Number(button.dataset.sample)]);
 });
 
-lookbook.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-look]");
-  if (!button) return;
-  applyLook(looks[Number(button.dataset.look)]);
-});
-
 fitMode.addEventListener("click", (event) => {
   const button = event.target.closest("[data-ear]");
   if (!button) return;
@@ -1202,6 +1174,8 @@ cameraButton.addEventListener("click", () => {
     startCamera();
   }
 });
+
+flipCameraButton.addEventListener("click", flipCamera);
 
 trackingButton.addEventListener("click", () => {
   if (trackingEnabled) {
@@ -1225,6 +1199,7 @@ stage.addEventListener("click", (event) => {
 sizeControl.addEventListener("input", updateFromControls);
 spreadControl.addEventListener("input", updateFromControls);
 heightControl.addEventListener("input", updateFromControls);
+realismControl.addEventListener("input", updateFromControls);
 leftEar.addEventListener("pointerdown", startDrag);
 rightEar.addEventListener("pointerdown", startDrag);
 bodyPiercing.addEventListener("pointerdown", startDrag);

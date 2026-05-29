@@ -44,6 +44,7 @@
             写真を選ぶ
           </label>
           <button id="cameraButton" type="button">● カメラ</button>
+          <button id="flipCameraButton" type="button">⇄ カメラ切替</button>
           <button id="trackingButton" type="button">◎ 追尾</button>
           <button id="favoriteButton" type="button">♡ 候補に追加</button>
           <button id="resetButton" type="button">↺ リセット</button>
@@ -86,6 +87,10 @@
             <span>高さ</span>
             <input id="heightControl" type="range" min="18" max="86" value="45">
           </label>
+          <label>
+            <span>リアル感</span>
+            <input id="realismControl" type="range" min="25" max="100" value="82">
+          </label>
         </div>
 
         <div class="panel-section">
@@ -101,11 +106,6 @@
             <button data-nudge="down" type="button" aria-label="下へ">↓</button>
             <button data-nudge="right" type="button" aria-label="右へ">→</button>
           </div>
-        </div>
-
-        <div class="panel-section">
-          <h2>Looks</h2>
-          <div class="lookbook" id="lookbook"></div>
         </div>
 
         <div class="panel-section">

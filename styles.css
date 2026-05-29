@@ -191,22 +191,45 @@ h1 {
   content: "";
   position: absolute;
   left: 50%;
-  top: 21%;
-  width: 34%;
-  height: 13%;
+  top: 19%;
+  width: 30%;
+  height: 11%;
   border-radius: 50%;
   background:
     radial-gradient(ellipse at center, rgba(34, 20, 14, calc(var(--piercing-shadow) * .70)) 0 26%, rgba(34, 20, 14, calc(var(--piercing-shadow) * .22)) 48%, transparent 72%);
-  filter: blur(2.2px);
+  filter: blur(1.8px);
   transform: translate(-50%, -50%) rotate(-10deg);
   pointer-events: none;
   mix-blend-mode: multiply;
+}
+
+.ear-anchor::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  width: 18%;
+  height: 9%;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at center, rgba(92, 37, 31, .22) 0 28%, rgba(184, 92, 78, .14) 44%, transparent 72%);
+  filter: blur(1.1px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  z-index: 0;
 }
 
 .ear-anchor.body::before {
   top: 50%;
   width: 54%;
   height: 20%;
+}
+
+.ear-anchor.body::after {
+  top: 50%;
+  width: 20%;
+  height: 10%;
 }
 
 .ear-anchor.body {
@@ -233,14 +256,15 @@ h1 {
 
 .earring {
   position: relative;
+  z-index: 2;
   display: block;
   width: 100%;
   height: 100%;
   filter:
     saturate(var(--piercing-warmth))
     drop-shadow(0 2px 1px rgba(255, 255, 255, calc(var(--piercing-highlight) * .55)))
-    drop-shadow(0 7px 6px rgba(18, 13, 9, var(--piercing-shadow)))
-    drop-shadow(0 2px 2px rgba(18, 13, 9, calc(var(--piercing-shadow) * .72)));
+    drop-shadow(0 4px 3px rgba(18, 13, 9, calc(var(--piercing-shadow) * .92)))
+    drop-shadow(0 1px 1px rgba(18, 13, 9, calc(var(--piercing-shadow) * .86)));
   mix-blend-mode: normal;
   overflow: visible;
 }
@@ -251,22 +275,11 @@ h1 {
   width: 100%;
   height: 100%;
   overflow: visible;
+  opacity: var(--svg-opacity, .62);
 }
 
 .earring::after {
-  content: "";
-  position: absolute;
-  inset: -3%;
-  z-index: 2;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 34% 22%, rgba(255, 255, 255, .72), transparent 16%),
-    radial-gradient(circle at 68% 72%, rgba(255, 255, 255, .38), transparent 18%),
-    url("assets/ai-jewelry-texture.png") center / 190% 190%;
-  mix-blend-mode: soft-light;
-  opacity: .28;
-  pointer-events: none;
-  filter: contrast(1.18) saturate(1.15);
+  display: none;
 }
 
 .earring::before {
@@ -483,99 +496,8 @@ input[type="range"] {
   gap: 10px;
 }
 
-.lookbook {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.look-card {
-  min-height: 176px;
-  padding: 10px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--white);
-  color: var(--ink);
-  cursor: pointer;
-  text-align: left;
-  display: grid;
-  grid-template-rows: 106px auto;
-  gap: 8px;
-}
-
-.look-face {
-  position: relative;
-  overflow: hidden;
-  border-radius: 8px;
-  background:
-    var(--look-photo, none),
-    radial-gradient(circle at 50% 36%, #e9bfa6 0 22%, transparent 23%),
-    radial-gradient(ellipse at 50% 70%, #d9a58c 0 25%, transparent 26%),
-    linear-gradient(160deg, #d8e2df, #f2e7dc);
-}
-
-.look-face.has-photo::before,
-.look-face.has-photo::after {
-  display: none;
-}
-
 .sample-option {
   min-height: 74px;
-}
-
-.look-face::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 44%;
-  width: 54px;
-  height: 72px;
-  border-radius: 44% 44% 48% 48%;
-  background: linear-gradient(145deg, #f0c7ad, #c98f77);
-  transform: translate(-50%, -50%);
-  box-shadow:
-    -28px 6px 0 -18px #e0a98f,
-    28px 6px 0 -18px #e0a98f;
-}
-
-.look-face::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -28px;
-  width: 118px;
-  height: 86px;
-  border-radius: 46% 46% 0 0;
-  background: linear-gradient(145deg, #e3ad93, #bd806d);
-  transform: translateX(-50%);
-}
-
-.look-card .earring {
-  position: absolute;
-  width: var(--look-size, 38px);
-  height: calc(var(--look-size, 38px) * 1.24);
-  left: var(--look-x, 50%);
-  top: var(--look-y, 50%);
-  transform: translate(-50%, -18%);
-  z-index: 2;
-}
-
-.look-title {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-
-.look-title strong,
-.look-title span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.look-title span {
-  color: var(--muted);
-  font-size: .84rem;
 }
 
 .favorites:empty::before {
@@ -774,25 +696,6 @@ input[type="range"] {
 
   .placement-grid {
     max-height: 238px;
-  }
-
-  .lookbook {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .look-card {
-    min-height: 138px;
-    grid-template-rows: 78px auto;
-    padding: 8px;
-  }
-
-  .look-title strong {
-    font-size: .84rem;
-  }
-
-  .look-title span {
-    font-size: .72rem;
   }
 
   .swatches {
