@@ -1025,7 +1025,7 @@ function drawPhoto(ctx, rect) {
   });
 }
 
-async function downloadTryon() {
+async function renderTryonCanvas() {
   const rect = stage.getBoundingClientRect();
   const canvas = document.createElement("canvas");
   const scale = 2;
@@ -1088,10 +1088,63 @@ async function downloadTryon() {
     drawRealisticPiercing(state.bodyX, state.bodyY);
   }
 
+  return canvas;
+}
+
+function saveCanvas(canvas, filename) {
   const link = document.createElement("a");
-  link.download = "earline-tryon.png";
+  link.download = filename;
   link.href = canvas.toDataURL("image/png");
   link.click();
+}
+
+async function downloadTryon() {
+  saveCanvas(await renderTryonCanvas(), "earline-tryon.png");
+}
+
+function applyAiFinish(canvas) {
+  const output = document.createElement("canvas");
+  output.width = canvas.width;
+  output.height = canvas.height;
+  const ctx = output.getContext("2d");
+  const width = output.width;
+  const height = output.height;
+
+  ctx.filter = "brightness(1.05) contrast(1.08) saturate(1.07)";
+  ctx.drawImage(canvas, 0, 0);
+  ctx.filter = "none";
+
+  const glow = ctx.createRadialGradient(width * .5, height * .38, 0, width * .5, height * .38, Math.max(width, height) * .72);
+  glow.addColorStop(0, "rgba(255,255,255,.16)");
+  glow.addColorStop(.48, "rgba(255,255,255,.04)");
+  glow.addColorStop(1, "rgba(18,13,9,.12)");
+  ctx.globalCompositeOperation = "soft-light";
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.globalCompositeOperation = "overlay";
+  ctx.globalAlpha = .2;
+  ctx.filter = "blur(10px)";
+  ctx.drawImage(canvas, 0, 0);
+  ctx.filter = "none";
+  ctx.globalAlpha = 1;
+
+  ctx.globalCompositeOperation = "source-over";
+  const vignette = ctx.createRadialGradient(width * .5, height * .46, width * .18, width * .5, height * .46, Math.max(width, height) * .72);
+  vignette.addColorStop(0, "rgba(0,0,0,0)");
+  vignette.addColorStop(1, "rgba(0,0,0,.20)");
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, width, height);
+
+  return output;
+}
+
+async function downloadAiFinish() {
+  setStatus("AI finish: processing locally...");
+  const canvas = await renderTryonCanvas();
+  const finished = applyAiFinish(canvas);
+  saveCanvas(finished, "earline-ai-finish.png");
+  setStatus(cameraStream ? "Camera: on / AI finish: saved" : "AI finish: saved");
 }
 
 function saveFavorites() {
@@ -1241,6 +1294,7 @@ document.querySelector("#resetButton").addEventListener("click", () => {
 });
 
 document.querySelector("#downloadButton").addEventListener("click", downloadTryon);
+document.querySelector("#aiFinishButton").addEventListener("click", downloadAiFinish);
 document.querySelector("#favoriteButton").addEventListener("click", addFavorite);
 document.querySelector("#clearFavoritesButton").addEventListener("click", () => {
   favorites = [];
